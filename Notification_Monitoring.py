@@ -164,7 +164,7 @@ class newNotice(object):
 
 
 conf = configparser.ConfigParser()
-conf.read('/home/dddx/Notification_Monitoring/config.ini',encoding='utf-8')
+conf.read('./config.ini',encoding='utf-8')
 Notice = newNotice()
 Notice.csvpath = conf.get("csv","path")
 Notice.flag_email = conf.get("email","flag_email")
@@ -178,7 +178,7 @@ Notice.server_api_url = conf.get("wechat","server_api_url")
 
 while 1>0:
     count = 0
-    with open(Notice.csvpath, 'r') as f:
+    with open(Notice.csvpath, 'r',encoding='utf-8') as f:
         csv_reader = csv.reader(f)
         for row in csv_reader:
             count += 1

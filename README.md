@@ -20,9 +20,16 @@ git clone git@gitee.com:twelvecat/notification_-monitoring.git
 
 配置文件为 `config.ini`,首次使用需要根据自身环境和需求修改配置。配置文件的修改请不要增加额外的单引号 `'` 或双引号 `"`,除文件内给出的配置项暂不支持其他配置。
 
-开启邮件通知需要将 `flag_email= Flase` 修改为 `flag_email= True`，并添加发送方和接收方的信息，**请注意，部分邮箱的密码并不是登陆密码，而是单独申请的授权码**。
+此处的路径建议使用绝对路径，经过测试在 Windows 和 Linux 下均能正常工作。、
 
-开启微信通知需要将 `flag_wechat = Flase` 修改为 `flag_wechat= True`，并添加对应的 api 和 key。目前支持 [server酱](https://sct.ftqq.com/) 和 [push plus](http://pushplus.hxtrip.com/)，但都需自行注册账户并修改对应信息。
+```ini
+[csv]
+path = ./UrlList.csv
+```
+
+开启邮件通知需要将 `flag_email= False` 修改为 `flag_email= True`，并添加发送方和接收方的信息，**请注意，部分邮箱的密码并不是登陆密码，而是单独申请的授权码**。
+
+开启微信通知需要将 `flag_wechat = False` 修改为 `flag_wechat= True`，并添加对应的 api 和 key。目前支持 [server酱](https://sct.ftqq.com/) 和 [push plus](http://pushplus.hxtrip.com/)，但都需自行注册账户并修改对应信息。
 
 3. 添加监测网站
 
