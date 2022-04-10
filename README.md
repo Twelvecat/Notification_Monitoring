@@ -1,32 +1,71 @@
 # Notification_Monitoring
 
-基于 DNSPod 用户 API 实现的纯 Shell 动态域名客户端，优先适配网卡地址，无法获得合法外网地址则使用外部接口获取 IP 地址
+用于监测 CUG 各学院网站最新通知，可以选用邮件或微信及时推送。如果需要监测其他学校或单位，可能需要修改 `Notification_Monitoring.py` 中的 `parse_data` 函数。
 
-# 使用方法
-
-- 编辑`ddnspod.sh`，分别修改`/your_real_path/ardnspod`、`arToken`和`arDdnsCheck`为真实信息
-
-- 运行`ddnspod.sh`，开启循环更新任务；建议将此脚本支持添加到计划任务；
-
-- 成功运行后，结果如下所示：
-
+## 使用方法
+ 
+1. 下载代码
+   
 ```
-Fetching Host Ip
-> Host Ip: 11.22.33.55
-> Record Type: A
-Fetching Ids of test.rehi.org
-> Domain Ids: 84982658 766956386
-Checking Record for test.rehi.org
-> Last Ip: 11.22.33.77
-Updating Record for test.rehi.org
-> arDdnsUpdate - success
+git clone git@github.com:Twelvecat/Notification_Monitoring.git
 ```
 
-### 小提示
-
-- 如需单文件运行，参考`ddnspod.sh`中的配置项，添加到`ardnspod`底部，直接运行`ardnspod`即可
+如果国内网络条件不好也可以使用下面的地址下载：
 
 ```
-echo "arToken=12345,7676f344eaeaea9074c123451234512d" >> ./ardnspod
-echo "arDdnsCheck test.org subdomain" >> ./ardnspod
+git clone git@gitee.com:twelvecat/notification_-monitoring.git
 ```
+
+2. 修改配置文件
+
+配置文件为 `config.ini`,首次使用需要根据自身环境和需求修改配置。配置文件的修改请不要增加额外的单引号 `'` 或双引号 `"`,除文件内给出的配置项暂不支持其他配置。
+
+开启邮件通知需要将 `flag_email= Flase` 修改为 `flag_email= True`，并添加发送方和接收方的信息，**请注意，部分邮箱的密码并不是登陆密码，而是单独申请的授权码**。
+
+开启微信通知需要将 `flag_wechat = Flase` 修改为 `flag_wechat= True`，并添加对应的 api 和 key。目前支持 [server酱](https://sct.ftqq.com/) 和 [push plus](http://pushplus.hxtrip.com/)，但都需自行注册账户并修改对应信息。
+
+3. 添加监测网站
+
+支持添加多个监测网站，只需在 `UrlList.csv` 中添加对应的网站即可。由于编码问题，建议使用 **VSCode** 编辑该文件，同时注意 **最后一行不要留空**。
+
+由于需要解析 csv 文件，请按照如下格式添加：
+
+```csv
+num,url,0,0,0
+```
+
+其中 `num` 为序号，从0索引，按顺序添加。后面 3 个 `0` 分别表示 `当前最新通知`、`网站名称` 和 `网站链接`,写 `0` 后程序会根据访问结果自行添加。  **请不要删除或修改首行标题栏**
+
+举例：
+
+```csv
+2,https://au.cug.edu.cn/syyjsjy.htm,0,0,0
+```
+
+4. 安装必要的库
+
+如果运行报错说明缺少一些必要的库，请参阅 `Notification_Monitoring.py` 文件的头部进行添加。
+
+目前确定需要单独添加如下库，其余依据个人设备不同自行添加：
+
+```bash
+pip install pandas
+pip install beautifulsoup4
+pip install requests
+```
+
+5. 运行程序
+   
+在文件目录内，运行如下指令即可开启程序，程序会每分钟定时访问 `UrlList.csv` 中添加的网站。并根据配置进行信息推送。
+
+```bash
+python Notification_Monitoring.py
+```
+
+## 小提示
+
+- 可以取消文件内的死循环，采用定时执行脚本的方式执行
+- 建议阅读代码逻辑，根据需要修改至其他网站监测
+- 对于不同网站的监测也可以通过识别序列号 `self.urlid` 进行特殊处理和解析
+- 若有 bug 可以在 issue 中提交，也可以修复后发起 pull requests
+
