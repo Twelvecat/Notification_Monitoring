@@ -76,3 +76,13 @@ python Notification_Monitoring.py
 - 对于不同网站的监测也可以通过识别序列号 `self.urlid` 进行特殊处理和解析
 - 若有 bug 可以在 issue 中提交，也可以修复后发起 pull requests
 
+## 参考资料
+本项目参考了 [spider-of-CNIC-notice](https://github.com/tianming123/spider-of-CNIC-notice/tree/master)，此处表示感谢。
+
+根据实际需求增加了如下功能：
+
+- 支持多网站监测
+- 引入了配置文件
+- 增加了微信推送
+- 舍弃了通过文章日期来检测是否为最新通知的方法
+- 增加了通过文章标题来检测是否为最新通知
