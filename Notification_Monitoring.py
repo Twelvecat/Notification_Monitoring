@@ -175,6 +175,7 @@ Notice.to_addr = conf.get("email","to_addr")
 Notice.flag_wechat = conf.get("wechat","flag_wechat")
 Notice.server_api_key = conf.get("wechat","server_api_key")
 Notice.server_api_url = conf.get("wechat","server_api_url")
+last_count = 0
 
 while 1>0:
     count = 0
@@ -182,7 +183,12 @@ while 1>0:
         csv_reader = csv.reader(f)
         for row in csv_reader:
             count += 1
-    print("[\tinfo]当前需要监控", count-1 ,"个网页")
+    if(count != last_count):
+        print("[\tinfo]当前需要监控", count-1 ,"个网页")
+        last_count = count
     for i in range(count-1):
         Notice.run(i)
+    localtime = time.asctime( time.localtime(time.time()) )
+    print("[\ttime]最新更新时间:" , localtime, end='\r')
     time.sleep(60)
+    print("                                                      ", end='\r')
