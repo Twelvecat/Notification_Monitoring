@@ -40,9 +40,11 @@ class newNotice(object):
             data = response.content
             response.close()
         except requests.exceptions.RequestException as e:
+            localtime = time.asctime( time.localtime(time.time()) )
+            print("[\ttime]触发时间:" , localtime)
             print("[\terror]", end="")
             print(e)
-            temp = "网页请求失败，链接为："+ self.url
+            temp = "网页请求失败，链接为:"+ self.url
             self.send_wechat(temp)
             return -1
         return data
@@ -55,13 +57,33 @@ class newNotice(object):
         soup = BeautifulSoup(data, 'html.parser', from_encoding='gb18030')
         self.urltitle = soup.title.string
         # all = soup.find('div',class_="text_list") #如果是类型则用 class_
-        if self.urlid == 13 or self.urlid == 14:
+        if self.urlid == 13 or self.urlid == 14:#处理置顶问题
             all = soup.find(id=re.compile(r"^line.*2$"))#正则表达式，此处是基于CUG的通知进行解析，搜寻第一个line开头的id
+        elif self.urlid == 17:#梨园医院特殊解析
+            all = soup.select('.list_newspage > ul > li > a')[0]
+            new_url = self.url +"/../../"+ all['href']
+            self.newurl=new_url
+            self.notice = all.em.text
+            return new_url
+        elif self.urlid == 18:#同济医院特殊解析
+            all = soup.select('.section > ul > li > a')[0]
+            new_url = self.url +"/../../"+ all['href']
+            self.newurl=new_url
+            self.notice = all.p.text
+            return new_url
+        elif self.urlid == 19:#协和医院特殊解析
+            all = soup.select('.tit9 > a')[0]
+            new_url = all['href']
+            self.newurl=new_url
+            self.notice = all.text
+            return new_url
         else:
             all = soup.find(id=re.compile(r"^line"))#正则表达式，此处是基于CUG的通知进行解析，搜寻第一个line开头的id
-        if all == None:   
-            print("[\terror]网页解析失败，网页标题：" , self.urltitle)
-            temp = "网页请求失败，链接为："+ self.url
+        if all == None: 
+            localtime = time.asctime( time.localtime(time.time()) )
+            print("[\ttime]触发时间:" , localtime)    
+            print("[\terror]网页解析失败，网页标题:" , self.urltitle)
+            temp = "网页请求失败，链接为:"+ self.url
             self.send_wechat(temp)
             return -1    
         new_url = self.url +"/../"+ all.a['href']
@@ -81,8 +103,8 @@ class newNotice(object):
             data.to_csv(self.csvpath, encoding='utf-8')
             localtime = time.asctime( time.localtime(time.time()) )
             print("[\ttime]" , localtime)
-            print("[\tinfo]网页序号：",self.urlid ," ;网页标题：" , self.urltitle)
-            print("[\tinfo]首次访问该网页，已记录最新通知：" , self.notice)
+            print("[\tinfo]网页序号:",self.urlid ," \t网页标题:" , self.urltitle)
+            print("[\tinfo]首次访问该网页，已记录最新通知:" , self.notice)
         else:
             if noticeremp != self.notice:
                 data.loc[self.urlid, '当前最新通知'] = self.notice
@@ -92,8 +114,8 @@ class newNotice(object):
                 send_notice = self.notice+"\r\n 网页链接为:"+self.newurl
                 localtime = time.asctime( time.localtime(time.time()) )
                 print("[\ttime]" , localtime)
-                print("[\tinfo]网页序号：",self.urlid ," ;网页标题：" , self.urltitle)
-                print("[\tinfo]已发布最新通知：" , self.notice)
+                print("[\tinfo]网页序号:",self.urlid ," \t网页标题:" , self.urltitle)
+                print("[\tinfo]已发布最新通知:" , self.notice)
                 self.send_email(send_notice,self.to_addr)
                 self.send_wechat(send_notice)
 
@@ -125,7 +147,7 @@ class newNotice(object):
             server.sendmail(from_addr, to_addr, msg.as_string())
             # 关闭服务器
             server.quit()
-            print("[\tinfo]已发送邮件至：" , self.to_addr)
+            print("[\tinfo]已发送邮件至:" , self.to_addr)
 
     def send_wechat(self,res):
         if self.flag_wechat == 'True':
@@ -141,8 +163,10 @@ class newNotice(object):
                 server_send_ip = requests.get(server_api, params=data, headers=header, timeout=60)
                 server_send_ip.close()
             except requests.exceptions.RequestException as e:
+                localtime = time.asctime( time.localtime(time.time()) )
+                print("[\ttime]触发时间:" , localtime)
                 print("[\terror]", end="")
-                print(e)     
+                print(e)      
             print("[\tinfo]已完成微信推送")
 
     def get_url(self,csvid):
@@ -164,7 +188,7 @@ class newNotice(object):
 
 
 conf = configparser.ConfigParser()
-conf.read('./config.ini',encoding='utf-8')
+conf.read('/home/dddx/Notification_Monitoring/config.ini',encoding='utf-8')
 Notice = newNotice()
 Notice.csvpath = conf.get("csv","path")
 Notice.flag_email = conf.get("email","flag_email")
@@ -191,4 +215,4 @@ while 1>0:
     localtime = time.asctime( time.localtime(time.time()) )
     print("[\ttime]最新更新时间:" , localtime, end='\r')
     time.sleep(60)
-    print("                                                      ", end='\r')
+    print("                                                        ", end='\r')
