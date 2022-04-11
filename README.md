@@ -75,6 +75,7 @@ python Notification_Monitoring.py
 - 建议阅读代码逻辑，根据需要修改至其他网站监测
 - 对于不同网站的监测也可以通过识别序列号 `self.urlid` 进行特殊处理和解析
 - 若有 bug 可以在 issue 中提交，也可以修复后发起 pull requests
+- **配合 [csv-to-html-table](https://github.com/derekeder/csv-to-html-table) 可以将存储在本地的csv显示在网页端，方便回溯之前的通知**
 
 ## 参考资料
 本项目参考了 [spider-of-CNIC-notice](https://github.com/tianming123/spider-of-CNIC-notice/tree/master)，此处表示感谢。
